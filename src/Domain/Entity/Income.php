@@ -2,23 +2,10 @@
 
 namespace App\Domain\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * Class Income
- * @ORM\Entity(repositoryClass=\App\Infrastructure\Drink\Income\Repository\IncomeRepository::class)
- */
 class Income
 {
-    /**
-     * @ORM\Column(type="string", length=100)
-     * @ORM\Id
-     */
     protected $drink;
 
-    /**
-     * @ORM\Column(type="decimal", scale=2)
-     */
     protected $money;
 
     public function setDrink(string $drink): void

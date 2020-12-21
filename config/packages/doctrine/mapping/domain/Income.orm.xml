@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping">
+<entity name="App\Domain\Entity\Income" repository-class="App\Infrastructure\Drink\Income\Repository\IncomeRepository">
+    <id name="drink" type="string" column="drink" />
+    <field name="money" type="decimal" column="money" />
+</entity>
+</doctrine-mapping>
