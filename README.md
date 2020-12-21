@@ -22,7 +22,7 @@ Options
 
 |Name|Type|Required|Description|Values|Default|
 |---|---|---|---|---|---|
-|extraHot (--extra-hot, -e)| |false|Flag indicating if the user wants extra hot drink|true, false|false|
+|extraHot (--extra-hot)| |false|Flag indicating if the user wants extra hot drink|true, false|false|
 
 List prices
 
@@ -109,7 +109,7 @@ docker/up
 
 Examples of the use of the application.
 ```
-docker/console app:order-drink tea 0.5 1 -e
+docker/console app:order-drink tea 0.5 1 --extra-hot
 docker/console app:order-drink coffee 0.5
 docker/console app:order-drink chocolate 1 --extra-hot
 ```
