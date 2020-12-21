@@ -1,3 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+CONTAINER_NAME='php'
+CID=$(docker ps -q -f status=running -f name=^/${CONTAINER_NAME}$)
+if [ ! "${CID}" ]; then
+  docker-compose build
+  docker-compose up -d
+fi
+unset CID
 
 docker-compose exec php composer $@
