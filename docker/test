@@ -1,0 +1,7 @@
+#!/bin/sh
+
+docker-compose exec -T php sh -lc './bin/console d:d:d --force --if-exists'
+docker-compose exec -T php sh -lc './bin/console d:d:c --if-not-exists'
+docker-compose exec -T php sh -lc './bin/console d:m:m -n'
+
+docker-compose exec -T php sh -lc "php -dpcov.enabled='1' -dpcov.directory=. -dpcov.exclude='~vendor~' ./vendor/bin/phpunit" $@

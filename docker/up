@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+docker-compose exec -T php sh -lc './bin/console d:d:d --force --if-exists'
+docker-compose exec -T php sh -lc './bin/console d:d:c --if-not-exists'
+docker-compose exec -T php sh -lc './bin/console d:m:m -n'
+
+docker-compose build
+docker-compose up -d

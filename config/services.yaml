@@ -1,0 +1,83 @@
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+  elastic:
+    hosts:
+      - '%env(ELASTIC_HOST)%'
+
+  env(ELASTIC_HOST): 'elasticsearch:9200'
+  env(DATABASE_URL): 'mysql://root:app@mysql:3306/app?serverVersion=8.0'
+
+  exception_to_status:
+    InvalidArgumentException: 400
+    App\Domain\User\Exception\InvalidCredentialsException: 401
+    App\Domain\User\Exception\ForbiddenException: 403
+    App\Infrastructure\Shared\Persistence\ReadModel\Exception\NotFoundException: 404
+    Broadway\Repository\AggregateNotFoundException: 404
+
+services:
+    # Needed since Since symfony/dependency-injection 5.1
+    Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+          $elasticConfig: '%elastic%'
+          $eventBus: '@broadway.event_handling.event_bus'
+          $eventStore: '@Broadway\EventStore\Dbal\DBALEventStore'
+
+    _instanceof:
+        App\Application\Command\CommandHandlerInterface:
+          public: true
+          tags:
+            - { name: messenger.message_handler, bus: messenger.bus.command }
+
+        App\Application\Query\QueryHandlerInterface:
+          public: true
+          tags:
+            - { name: messenger.message_handler, bus: messenger.bus.query }
+
+        App\Infrastructure\Shared\Bus\AsyncEvent\AsyncEventHandlerInterface:
+          public: true
+          tags:
+            - { name: messenger.message_handler, bus: messenger.bus.event.async }
+
+        Broadway\EventHandling\EventListener:
+          public: true
+          tags:
+              - { name: broadway.domain.event_listener }
+
+    App\:
+        resource: '../src/*'
+        exclude: '../src/**/{Migrations,EventSubscriber}'
+
+    App\Infrastructure\Shared\Bus\Command\MessengerCommandBus:
+        arguments:
+          - '@messenger.bus.command'
+
+    App\Infrastructure\Shared\Bus\Query\MessengerQueryBus:
+        arguments:
+          - '@messenger.bus.query'
+
+    App\Infrastructure\Shared\Bus\AsyncEvent\MessengerAsyncEventBus:
+        arguments:
+          - '@messenger.bus.event.async'
+
+    ### Event Store
+
+    Broadway\EventStore\Dbal\DBALEventStore:
+        public: true
+        arguments:
+          - '@doctrine.dbal.default_connection'
+          - '@broadway.serializer.payload'
+          - '@broadway.serializer.metadata'
+          - 'events'
+          - true
+          - '@broadway.uuid.converter'
+
+    ### UI
+
+    App\UI\Cli\Command\:
+        resource: '../src/UI/Cli/Command'
